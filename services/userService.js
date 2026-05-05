@@ -1,15 +1,9 @@
 import User from "../models/User.js";
 
 const createUser = async (data) => {
-    const { nome, email, cpf, telefone, idade, ativo } = data;
+    const { name, email, cpf, telephone, age, active } = data;
 
-    if (!nome || !email || !cpf || !telefone || idade === undefined || ativo === undefined) {
-        const error = new Error("Nome, email, CPF, telefone, idade e ativo são obrigatórios");
-        error.statusCode = 400;
-        throw error;
-    }
-
-    const userExistsEmail = await User.findOne({ email });
+    const userExistsEmail = await User.findOne({ email: email });
 
     if (userExistsEmail) {
         const error = new Error("Já existe um usuário com esse email");
@@ -17,7 +11,7 @@ const createUser = async (data) => {
         throw error;
     }
 
-    const userExistsCPF = await User.findOne({ cpf });
+    const userExistsCPF = await User.findOne({ cpf: cpf });
 
     if (userExistsCPF) {
         const error = new Error("Já existe um usuário com esse CPF");
@@ -25,7 +19,7 @@ const createUser = async (data) => {
         throw error;
     }
 
-    return User.create({ nome, email, cpf, telefone, idade, ativo });
+    return User.create({ name, email, cpf, telephone, age, active });
 }
 
 const getAllUsers = async () => {

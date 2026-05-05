@@ -9,7 +9,47 @@ const createAccount = async (req, res, next) => {
     }
 }
 
+const getAllAccounts = async (req, res, next) => {
+    try {
+        const accounts = await accountService.getAllAccounts();
+        res.json(accounts);
+    } catch (error) {
+        next(error);
+    }
+}
+
+const getAccountById = async (req, res, next) => {
+    try {
+        const account = await accountService.getAccountById( req.params.id );
+        res.json(account)
+    } catch (error) {
+        next(error);
+    }
+}
+
+const getAccountByAccountNumber = async (req, res, next) => {
+    try {
+        const account = await accountService.getAccountByAccountNumber( req.params.accountNumber );
+        res.json(account)
+    } catch (error) {
+        next(error);
+    }
+}
+
+const getAccountBalance = async (req, res, next) => {
+    try {
+        const accountBalance = await accountService.getAccountBalance( req.params.id );
+        res.json(accountBalance)
+    } catch (error) {
+        next(error);
+    }
+}
+
 
 export default {
-    createAccount
+    createAccount,
+    getAllAccounts,
+    getAccountById,
+    getAccountByAccountNumber,
+    getAccountBalance
 }
