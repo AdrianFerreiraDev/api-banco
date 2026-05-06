@@ -45,11 +45,41 @@ const getAccountBalance = async (req, res, next) => {
     }
 }
 
+const accountDeposit = async (req, res, next) => {
+    try {
+        const deposit = await accountService.accountDeposit( req.body, req.params.id );
+        res.json(deposit);
+    } catch (error) {
+        next(error);
+    }
+}
+
+const accountSake = async (req, res, next) => {
+    try {
+        const sake = await accountService.accountSake( req.body, req.params.id );
+        res.json(sake);
+    } catch (error) {
+        next(error);
+    }
+}
+
+const accountSakeSimulate = async (req, res, next) => {
+    try {
+        const sakeSimulate = await accountService.accountSakeSimulate( req.body, req.params.id );
+        res.json(sakeSimulate);
+    } catch (error) {
+        next(error)
+    }
+}
+
 
 export default {
     createAccount,
     getAllAccounts,
     getAccountById,
     getAccountByAccountNumber,
-    getAccountBalance
+    getAccountBalance,
+    accountDeposit,
+    accountSake,
+    accountSakeSimulate
 }

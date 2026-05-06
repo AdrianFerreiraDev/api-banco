@@ -8,7 +8,10 @@ router.get("/", accountController.getAllAccounts);
 router.get("/:id", accountController.getAccountById);
 router.get("/number/:accountNumber", accountController.getAccountByAccountNumber);
 router.get("/:id/balance", accountController.getAccountBalance);
-router.
+router.post("/:id/deposit", accountController.accountDeposit);
+router.post("/:id/withdraw", accountController.accountSake);
+router.post("/:id/withdraw/simulate", accountController.accountSakeSimulate);
+
 
 
 export default router;
