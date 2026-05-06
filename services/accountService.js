@@ -80,7 +80,7 @@ const accountDeposit = async (data, id) => {
             currentBalance: account.balance + value,
             description: description,
             status: statusReceived
-        }) 
+        })
     }
 
     if (!account) {
@@ -145,7 +145,7 @@ const accountSake = async (data, id) => {
             currentBalance: account.balance - value,
             description: description,
             status: statusReceived
-        }) 
+        })
     }
 
     if (!account) {
@@ -264,6 +264,151 @@ const accountSakeSimulate = async (data, id) => {
     return deposit;
 }
 
+const accountTransfer = async (data) => {
+    let fromAccount = await Account.findById(data.fromAccountId);
+    let toAccount = await Account.findById(data.toAccountId);
+    const { value, description } = data;
+
+    if (!fromAccount || !toAccount) {
+        const error = new Error("Conta de destino ou de origem não encontrada");
+        error.statusCode = 400;
+        throw error;
+    }
+    if (fromAccount.active !== true || toAccount.active !== true) {
+        const error = new Error("Conta de destino ou de origem inativa");
+        error.statusCode = 400;
+        throw error;
+    }
+    if (fromAccount.blocked === true || toAccount.blocked === true) {
+        const error = new Error("Conta de destino ou de origem bloqueada");
+        error.statusCode = 400;
+        throw error;
+    }
+    if (value <= 0) {
+        const error = new Error("Valor menor que zero");
+        error.statusCode = 400;
+        throw error;
+    }
+    if (fromAccount === toAccount) {
+        const error = new Error("Mesma conta origem e destino");
+        error.statusCode = 400;
+        throw error;
+    }
+
+    let balance = fromAccount.balance;
+
+    if (fromAccount.type === "current") {
+        balance += fromAccount.limit
+    }
+
+    if (value > balance) {
+        const error = new Error("O valor é maior do que o disponivel");
+        error.statusCode = 400;
+        throw error;
+    }
+
+    fromAccount.balance -= value;
+
+    fromAccount = await Account.findByIdAndUpdate(
+        fromAccount._id,
+        { balance: fromAccount.balance }
+    )
+
+    toAccount.balance += value;
+
+    toAccount = await Account.findByIdAndUpdate(
+        toAccount._id,
+        { balance: toAccount.balance }
+    )
+
+    const messageTranfer = {
+        "message": "Transferência realizada com sucesso",
+        "origin": {
+            "previousBalance": fromAccount.balance,
+            "currentBalance": fromAccount.balance - value
+        },
+        "destination": {
+            "previousBalance": toAccount.balance,
+            "currentBalance": toAccount.balance + value
+        },
+        "description": description
+    }
+
+    return messageTranfer;
+}
+
+const getAccountStatement = async (id) => {
+    const accountExists = await Account.findById( id );
+
+    if (!accountExists) {
+        const error = new Error("Conta não encontrada");
+        error.statusCode = 400;
+        throw error;
+    }
+    
+    const transactions = await Transaction.find({ accountId: id });
+
+    return transactions.filter( transaction =>  transaction.status === "completed" );
+}
+
+const accountTransferSimulate = async (data) => {
+    let fromAccount = await Account.findById(data.fromAccountId);
+    let toAccount = await Account.findById(data.toAccountId);
+    const { value, description } = data;
+
+    if (!fromAccount || !toAccount) {
+        const error = new Error("Conta de destino ou de origem não encontrada");
+        error.statusCode = 400;
+        throw error;
+    }
+    if (fromAccount.active !== true || toAccount.active !== true) {
+        const error = new Error("Conta de destino ou de origem inativa");
+        error.statusCode = 400;
+        throw error;
+    }
+    if (fromAccount.blocked === true || toAccount.blocked === true) {
+        const error = new Error("Conta de destino ou de origem bloqueada");
+        error.statusCode = 400;
+        throw error;
+    }
+    if (value <= 0) {
+        const error = new Error("Valor menor que zero");
+        error.statusCode = 400;
+        throw error;
+    }
+    if (fromAccount === toAccount) {
+        const error = new Error("Mesma conta origem e destino");
+        error.statusCode = 400;
+        throw error;
+    }
+
+    let balance = fromAccount.balance;
+
+    if (fromAccount.type === "current") {
+        balance += fromAccount.limit
+    }
+
+    if (value > balance) {
+        const error = new Error("O valor é maior do que o disponivel");
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const messageTranfer = {
+        "message": "Transferência possivel",
+        "origin": {
+            "previousBalance": fromAccount.balance,
+            "currentBalance": fromAccount.balance - value
+        },
+        "destination": {
+            "previousBalance": toAccount.balance,
+            "currentBalance": toAccount.balance + value
+        },
+        "description": description
+    }
+
+    return messageTranfer;
+}
 
 export default {
     createAccount,
@@ -273,5 +418,8 @@ export default {
     getAccountBalance,
     accountDeposit,
     accountSake,
-    accountSakeSimulate
+    accountSakeSimulate,
+    accountTransfer,
+    getAccountStatement,
+    accountTransferSimulate
 }
