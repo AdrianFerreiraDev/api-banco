@@ -269,6 +269,18 @@ const accountTransfer = async (data) => {
     let toAccount = await Account.findById(data.toAccountId);
     const { value, description } = data;
 
+    async function createTransaction(account, type, previousBalace, currentBalance) {
+        Transaction.create({
+            accountId: account._id,
+            type: type,
+            value: value,
+            previousBalace: previousBalace,
+            currentBalance: currentBalance,
+            description: description,
+            status: "completed"       
+        })
+    }
+
     if (!fromAccount || !toAccount) {
         const error = new Error("Conta de destino ou de origem não encontrada");
         error.statusCode = 400;
@@ -333,6 +345,9 @@ const accountTransfer = async (data) => {
         },
         "description": description
     }
+
+    createTransaction(fromAccount, "transfer-sent", fromAccount.balance, fromAccount.balance - value);
+    createTransaction(toAccount, "transfer-received", toAccount.balance, toAccount.balance + value);
 
     return messageTranfer;
 }
