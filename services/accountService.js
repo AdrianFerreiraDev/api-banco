@@ -133,7 +133,7 @@ const accountDeposit = async (data, id) => {
     return deposit;
 }
 
-const accountSake = async (data, id) => {
+const accountWithdraw = async (data, id) => {
     let account = await Account.findById(id);
 
     async function createTransaction(statusReceived) {
@@ -211,7 +211,7 @@ const accountSake = async (data, id) => {
     return deposit;
 }
 
-const accountSakeSimulate = async (data, id) => {
+const accountWithdrawSimulate = async (data, id) => {
     let account = await Account.findById(id);
 
     if (!account) {
@@ -432,8 +432,8 @@ export default {
     getAccountByAccountNumber,
     getAccountBalance,
     accountDeposit,
-    accountSake,
-    accountSakeSimulate,
+    accountWithdraw,
+    accountWithdrawSimulate,
     accountTransfer,
     getAccountStatement,
     accountTransferSimulate
