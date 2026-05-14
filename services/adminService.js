@@ -152,6 +152,95 @@ const openAccount = async (id) => {
     }
 }
 
+const monthlyFeeAccount = async (id, data) => {
+    let account = await Account.findById(id);
+    const { value, description } = data;
+
+    if (!account) {
+        const error = new Error("Conta não encontrada");
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (account.active === false) {
+        const error = new Error("Conta inativa");
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (account.blocked === true) {
+        const error = new Error("Conta bloqueada");
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (value <= 0) {
+        const error = new Error("Valor precisa ser maior que 0");
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (account.balance <= 0) {
+        const error = new Error("Saldo não suficiente");
+        error.statusCode = 400;
+        throw error;
+    }
+
+    account = await Account.findByIdAndUpdate(
+        id,
+        { balance: account.balance - value }
+    )
+
+    Transaction.create({
+        accountId: account._id,
+        type: "fee",
+        value: value,
+        previousBalace: account.balance,
+        currentBalance: account.balance - value,
+        description: description,
+        status: "completed"       
+    })
+
+    return {
+        previousBalace: account.balance,
+        value: value,
+        currentBalance: account.balance - value
+    }
+}
+
+//Transactions
+const refundTransaction = async (id) => {
+    const transaction = await Transaction.findById(id);
+
+    if (!transaction) {
+        const error = new Error("Transação não encontrada");
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (transaction.status === "failed" || transaction.status === "canceled") {
+        const error = new Error("Transação não concluída");
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (transaction.type !== "deposit" || transaction.type !== "withdraw" || transaction.type !== "fee") {
+        const error = new Error("Tipo de transação não válida");
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const account
+
+    let transactionRefund = transaction;
+
+
+
+    if (transaction.type === "deposit") {
+
+    }
+}
+
 
 
 export default {
@@ -168,4 +257,5 @@ export default {
     unblockAccount,
     closeAccount,
     openAccount,
+    monthlyFeeAccount
 }

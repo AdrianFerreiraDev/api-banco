@@ -1,4 +1,3 @@
-import Account from "../models/Account.js";
 import adminService from "../services/adminService.js";
 
 //Users
@@ -93,6 +92,27 @@ const openAccount = async (req, res, next) => {
     }
 }
 
+const monthlyFeeAccount = async (req, res, next) => {
+    try {
+        const accountFee = await adminService.monthlyFeeAccount( req.params.id, req.body );
+        res.json(accountFee);
+    } catch (error) {
+        next(error);
+    }
+}
+
+//Transaction
+const refundTransaction = async (req, res, next) => {
+    try {
+        const refundedTransaction = await adminService.refundTransaction( req.params.id );
+        res.json(refundedTransaction);
+        } catch (error) {
+        next(error);
+    }
+}
+
+
+
 
 export default {
     //Users
@@ -108,4 +128,6 @@ export default {
     unblockAccount,
     closeAccount,
     openAccount,
+    monthlyFeeAccount,
+    refundTransaction,
 }

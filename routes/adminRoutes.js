@@ -16,6 +16,10 @@ router.patch("/accounts/:id/block", adminController.blockAccount);
 router.patch("/accounts/:id/unblock", adminController.unblockAccount);
 router.patch("/accounts/:id/close", adminController.closeAccount);
 router.patch("/accounts/:id/open", adminController.openAccount);
+router.post("/accounts/:id/monthly-fee", adminController.monthlyFeeAccount);
+
+//Transactions
+router.post("/transactions/:id/refund", adminController.refundTransaction);
 
 
 export default router;
