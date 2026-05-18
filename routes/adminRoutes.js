@@ -17,9 +17,14 @@ router.patch("/accounts/:id/unblock", adminController.unblockAccount);
 router.patch("/accounts/:id/close", adminController.closeAccount);
 router.patch("/accounts/:id/open", adminController.openAccount);
 router.post("/accounts/:id/monthly-fee", adminController.monthlyFeeAccount);
+router.get("/accounts/negative-balance", adminController.getAccountsNegative);
+router.get("/accounts/top-balances/:limit", adminController.getBiggestBalances);
 
 //Transactions
 router.post("/transactions/:id/refund", adminController.refundTransaction);
+
+router.get("/reports/general", adminController.generalReport);
+router.get("/reports/financial", adminController.financialReport);
 
 
 export default router;

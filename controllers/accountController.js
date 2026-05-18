@@ -54,18 +54,18 @@ const accountDeposit = async (req, res, next) => {
     }
 }
 
-const accountSake = async (req, res, next) => {
+const accountWithdraw = async (req, res, next) => {
     try {
-        const sake = await accountService.accountSake(req.body, req.params.id);
+        const sake = await accountService.accountWithdraw(req.body, req.params.id);
         res.json(sake);
     } catch (error) {
         next(error);
     }
 }
 
-const accountSakeSimulate = async (req, res, next) => {
+const accountWithdrawSimulate = async (req, res, next) => {
     try {
-        const sakeSimulate = await accountService.accountSakeSimulate(req.body, req.params.id);
+        const sakeSimulate = await accountService.accountWithdrawSimulate(req.body, req.params.id);
         res.json(sakeSimulate);
     } catch (error) {
         next(error)
@@ -107,8 +107,8 @@ export default {
     getAccountByAccountNumber,
     getAccountBalance,
     accountDeposit,
-    accountSake,
-    accountSakeSimulate,
+    accountWithdraw,
+    accountWithdrawSimulate,
     accountTransfer,
     getAccountStatement,
     accountTransferSimulate

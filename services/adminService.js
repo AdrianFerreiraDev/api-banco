@@ -198,7 +198,7 @@ const monthlyFeeAccount = async (id, data) => {
         previousBalace: account.balance,
         currentBalance: account.balance - value,
         description: description,
-        status: "completed"       
+        status: "completed"
     })
 
     return {
@@ -206,6 +206,16 @@ const monthlyFeeAccount = async (id, data) => {
         value: value,
         currentBalance: account.balance - value
     }
+}
+
+const getAccountsNegative = async () => {
+    return await Account.find({
+        balance: { $lt: 0 }
+    })
+}
+
+const getBiggestBalances = async (limit) => {
+    return await Account.find().sort({ balance: -1 }).limit(limit);
 }
 
 //Transactions
@@ -224,23 +234,111 @@ const refundTransaction = async (id) => {
         throw error;
     }
 
-    if (transaction.type !== "deposit" || transaction.type !== "withdraw" || transaction.type !== "fee") {
+    if (transaction.type !== "deposit" && transaction.type !== "withdraw" && transaction.type !== "fee") {
         const error = new Error("Tipo de transação não válida");
         error.statusCode = 400;
         throw error;
     }
 
-    const account
+    let account = await Account.findById(transaction.accountId);
 
-    let transactionRefund = transaction;
+    account = await Account.findByIdAndUpdate(
+        account._id,
+        { balance: transaction.type === "deposit" ? account.balance - transaction.value : account.balance + transaction.value }
+    );
+
+    Transaction.create({
+        accountId: account._id,
+        type: "reversal",
+        value: transaction.value,
+        previousBalace: account.balance,
+        currentBalance: transaction.type === "deposit" ? account.balance - transaction.value : account.balance + transaction.value,
+        description: transaction.description,
+        status: "completed"
+    });
 
 
-
-    if (transaction.type === "deposit") {
-
+    return {
+        previousBalace: account.balance,
+        reversal: transaction.value,
+        currentBalance: transaction.type === "deposit" ? account.balance - transaction.value : account.balance + transaction.value
     }
+
+
 }
 
+
+const generalReport = async () => {
+    const allAccounts = await Account.find()
+    let totalBalance = 0;
+
+    for (const account of allAccounts) {
+        totalBalance += account.balance
+    }
+
+    return {
+        totalUsers: await User.countDocuments(),
+        totalActiveUsers: await User.countDocuments({ active: true }),
+        totalInactiveUsers: await User.countDocuments({ active: false }),
+        totalAccounts: await Account.countDocuments(),
+        totalActiveAccounts: await Account.countDocuments({ active: true }),
+        totalBlockedAccounts: await Account.countDocuments({ blocked: true }),
+        totalTransactions: await Transaction.countDocuments(),
+        totalBalance: totalBalance
+    };
+}
+
+const financialReport = async () => {
+    const allDeposit = await Transaction.find({
+        type: "deposit",
+        status: "completed"
+    });
+    const allWithdraw = await Transaction.find({
+        type: "withdraw",
+        status: "completed"
+    });
+    const allTransfer = await Transaction.find({
+        $or: [
+            { type: "transfer-sent" },
+            { type: "transfer-received" }
+        ],
+        status: "completed"
+    })
+    const allFee = await Transaction.find({
+        type: "fee",
+        status: "completed"
+    });
+    const allReversal = await Transaction.find({
+        type: "reversal",
+        status: "completed"
+    });
+
+    let report = {
+        totalDeposit: null,
+        totalWithdraw: null,
+        totalTransfer: null,
+        totalFee: null,
+        totalReversal: null
+    }
+
+    allDeposit.forEach(transaction => {
+        report.totalDeposit += transaction.value
+    })
+    allWithdraw.forEach(transaction => {
+        report.totalWithdraw += transaction.value
+    })
+    allTransfer.forEach(transaction => {
+        report.totalTransfer += transaction.value
+    })
+    allFee.forEach(transaction => {
+        report.totalFee += transaction.value
+    })
+    allReversal.forEach(transaction => {
+        report.totalReversal += transaction.value
+    })
+
+    return report;
+}
 
 
 export default {
@@ -257,5 +355,10 @@ export default {
     unblockAccount,
     closeAccount,
     openAccount,
-    monthlyFeeAccount
+    monthlyFeeAccount,
+    refundTransaction,
+    generalReport,
+    financialReport,
+    getAccountsNegative,
+    getBiggestBalances
 }

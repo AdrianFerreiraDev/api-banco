@@ -101,6 +101,24 @@ const monthlyFeeAccount = async (req, res, next) => {
     }
 }
 
+const getAccountsNegative = async (req, res, next) => {
+    try {
+         const negativeAccounts = await adminService.getAccountsNegative();
+         res.json(negativeAccounts);
+    } catch (error) {
+        next(error);
+    }
+}
+
+const getBiggestBalances = async (req, res, next) => {
+    try {
+        const balances = await adminService.getBiggestBalances( req.params.limit );
+        res.json(balances)
+    } catch (error) {
+        next(error);
+    }
+}
+
 //Transaction
 const refundTransaction = async (req, res, next) => {
     try {
@@ -112,6 +130,23 @@ const refundTransaction = async (req, res, next) => {
 }
 
 
+const generalReport = async (req, res, next) => {
+    try {
+        const report = await adminService.generalReport();
+        res.json(report);
+    } catch (error) {
+        next(error);
+    }
+}
+
+const financialReport = async (req, res, next) => {
+    try {
+        const report = await adminService.financialReport();
+        res.json(report);
+    } catch (error) {
+        next(error);
+    }
+}
 
 
 export default {
@@ -130,4 +165,8 @@ export default {
     openAccount,
     monthlyFeeAccount,
     refundTransaction,
+    generalReport,
+    financialReport,
+    getAccountsNegative,
+    getBiggestBalances
 }
