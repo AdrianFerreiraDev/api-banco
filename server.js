@@ -4,6 +4,8 @@ setServers(["1.1.1.1", "8.8.8.8"])
 import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
+
+import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import accountRoutes from "./routes/accountRoutes.js";
 import transactionRoutes from "./routes/transactionRoutes.js";
@@ -21,11 +23,12 @@ app.get("/", (req, res) => {
     res.json({ message: "API do banco funcionando" });
 });
 
+app.use("/auth", authRoutes);
+
 app.use("/users", userRoutes);
 app.use("/accounts", accountRoutes);
 app.use("/transactions", transactionRoutes);
 app.use("/admin", adminRoutes);
-
 
 const startServer = async () => {
     try {

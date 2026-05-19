@@ -18,9 +18,19 @@ const UserSchema = new mongoose.Schema(
             type: Number,
             required: true
         },
+        password: {
+            type: String,
+            required: true,
+            select: false
+        },
         telephone: {
             type: Number,
             required: true
+        },
+        role: {
+            type: String,
+            enum: ["user", "admin"],
+            default: "user"
         },
         age: {
             type: Number,
@@ -28,7 +38,7 @@ const UserSchema = new mongoose.Schema(
         },
         active: {
             type: Boolean,
-            required: true
+            default: true
         }
     },
     {
