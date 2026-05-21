@@ -22,6 +22,38 @@ const createUser = async (data) => {
     return User.create({ name, email, cpf, telephone, age, active });
 }
 
+const updateMe = async (userId, data) => {
+    delete data.role;
+    delete data.active;
+    delete data.password;
+
+    if (data.email) {
+        const emailExists = await User.findOne({
+            email: data.email,
+            _id: { $ne: userId },
+        });
+
+        if (emailExists) {
+            const error = new Error("Já existe outro usuário com esse email");
+            error.statusCode = 400;
+            throw error;
+        }
+    }
+
+    const user = await User.findByIdAndUpdate(userId, data, {
+        new: true,
+        runValidators: true,
+    });
+
+    if (!user) {
+        const error = new Error("Usuário não encontrado");
+        error.statusCode = 404;
+        throw error;
+    }
+
+    return user;
+}
+
 const getAllUsers = async () => {
     return User.find();
 }
@@ -92,6 +124,7 @@ const getUserByEmail = async (email) => {
 
 export default {
     createUser,
+    updateMe,
     getAllUsers,
     getUserById,
     updateUser,
