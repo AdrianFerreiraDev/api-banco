@@ -2,26 +2,18 @@ import Account from "../models/Account.js";
 import Transaction from "../models/Transaction.js";
 import User from "../models/User.js";
 
-const createAccount = async (data) => {
-    const { userId, accountNumber, agency, type, balance, limit, active, blocked } = data
+const createAccount = async (user, data) => {
+    const { accountNumber, agency, type, balance, limit, active, blocked } = data
 
-    const userExist = await User.findOne({ _id: userId })
+    const userAccountId = await Account.findOne({ userId: user._id })
 
-    if (!userExist) {
-        const error = new Error("Usuário não encontrado");
-        error.statusCode = 400;
-        throw error;
-    }
-
-    const userAccountUserId = await Account.findOne({ userId: userId })
-
-    if (userAccountUserId) {
+    if (userAccountId) {
         const error = new Error("Já existe uma conta com esse ID");
         error.statusCode = 400;
         throw error;
     }
 
-    return Account.create({ userId, accountNumber, agency, type, balance, limit, active, blocked })
+    return Account.create({ userId: user._id, accountNumber, agency, type, balance, limit, active, blocked })
 }
 
 const getAllAccounts = async () => {

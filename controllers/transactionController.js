@@ -45,8 +45,18 @@ const getTransactionByYear = async (req, res, next) => {
     }
 }
 
+const getMeTransactions = async (req, res, next) => {
+    try {
+        const meTransactions = await transactionService.getMeTransactions( req.user._id );
+        res.json(meTransactions);
+    } catch (error) {
+        next(error);
+    }
+}
+
 
 export default {
+    getMeTransactions,
     getAllTransactions,
     getTransactionById,
     getTransactionByType,

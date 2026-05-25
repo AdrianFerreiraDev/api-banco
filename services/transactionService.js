@@ -82,8 +82,23 @@ const getTransactionByYear = async (year) => {
     return transaction;
 }
 
+const getMeTransactions = async (userId) => {
+    const account = await Account.findOne({ userId: userId })
+    
+    if (!account) {
+        const error = new Error("Conta do usuário não encontrada");
+        error.statusCode = 400;
+        throw error;
+    }
+    
+    const userTransactions = await Transaction.find({ accountId: account._id });
+
+    return userTransactions;    
+}
+
 
 export default {
+    getMeTransactions,
     getAllTransactions,
     getTransactionById,
     getTransactionByType,
