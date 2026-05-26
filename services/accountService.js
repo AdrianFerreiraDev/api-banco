@@ -2,10 +2,10 @@ import Account from "../models/Account.js";
 import Transaction from "../models/Transaction.js";
 import User from "../models/User.js";
 
-const createAccount = async (user, data) => {
-    const { accountNumber, agency, type, balance, limit, active, blocked } = data
+const createAccount = async (userData, accountData) => {
+    const { accountNumber, agency, type, balance, limit, active, blocked } = accountData
 
-    const userAccountId = await Account.findOne({ userId: user._id })
+    const userAccountId = await Account.findOne({ userId: userData._id })
 
     if (userAccountId) {
         const error = new Error("Já existe uma conta com esse ID");
@@ -13,7 +13,19 @@ const createAccount = async (user, data) => {
         throw error;
     }
 
-    return Account.create({ userId: user._id, accountNumber, agency, type, balance, limit, active, blocked })
+    return Account.create({ userId: userData._id, accountNumber, agency, type, balance, limit, active, blocked })
+}
+
+const getMeAccount = async (id) => {
+    const account = await Account.findOne({ userId: id });
+
+    if (!account) {
+        const error = new Error("Conta não encontrada/inexistente");
+        error.statusCode = 400;
+        throw error;
+    }
+
+    return account;
 }
 
 const getAllAccounts = async () => {
@@ -61,7 +73,7 @@ const getAccountBalance = async (id) => {
 }
 
 const accountDeposit = async (data, id) => {
-    let account = await Account.findById(id);
+    let account = await Account.findOne({ userId: id });
 
     async function createTransaction(statusReceived) {
         Transaction.create({
@@ -256,8 +268,8 @@ const accountWithdrawSimulate = async (data, id) => {
     return deposit;
 }
 
-const accountTransfer = async (data) => {
-    let fromAccount = await Account.findById(data.fromAccountId);
+const accountTransfer = async (user, data) => {
+    let fromAccount = await Account.findById(user._id);
     let toAccount = await Account.findById(data.toAccountId);
     const { value, description } = data;
 
@@ -358,8 +370,8 @@ const getAccountStatement = async (id) => {
     return transactions.filter( transaction =>  transaction.status === "completed" );
 }
 
-const accountTransferSimulate = async (data) => {
-    let fromAccount = await Account.findById(data.fromAccountId);
+const accountTransferSimulate = async (user, data) => {     
+    let fromAccount = await Account.findById(user._id);
     let toAccount = await Account.findById(data.toAccountId);
     const { value, description } = data;
 
@@ -419,6 +431,7 @@ const accountTransferSimulate = async (data) => {
 
 export default {
     createAccount,
+    getMeAccount,
     getAllAccounts,
     getAccountById,
     getAccountByAccountNumber,

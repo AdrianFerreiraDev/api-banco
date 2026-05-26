@@ -9,6 +9,15 @@ const createAccount = async (req, res, next) => {
     }
 }
 
+const getMeAccount = async (req, res, next) => {
+    try {
+        const meAccount = await accountService.getMeAccount( req.user._id );
+        res.json(meAccount);
+    } catch (error) {
+        next(error);
+    }
+}
+
 const getAllAccounts = async (req, res, next) => {
     try {
         const accounts = await accountService.getAllAccounts();
@@ -47,7 +56,7 @@ const getAccountBalance = async (req, res, next) => {
 
 const accountDeposit = async (req, res, next) => {
     try {
-        const deposit = await accountService.accountDeposit(req.body, req.params.id);
+        const deposit = await accountService.accountDeposit(req.body, req.user._id);
         res.json(deposit);
     } catch (error) {
         next(error);
@@ -56,7 +65,7 @@ const accountDeposit = async (req, res, next) => {
 
 const accountWithdraw = async (req, res, next) => {
     try {
-        const sake = await accountService.accountWithdraw(req.body, req.params.id);
+        const sake = await accountService.accountWithdraw(req.body, req.user._id);
         res.json(sake);
     } catch (error) {
         next(error);
@@ -65,7 +74,7 @@ const accountWithdraw = async (req, res, next) => {
 
 const accountWithdrawSimulate = async (req, res, next) => {
     try {
-        const sakeSimulate = await accountService.accountWithdrawSimulate(req.body, req.params.id);
+        const sakeSimulate = await accountService.accountWithdrawSimulate(req.body, req.user._id);
         res.json(sakeSimulate);
     } catch (error) {
         next(error)
@@ -74,7 +83,7 @@ const accountWithdrawSimulate = async (req, res, next) => {
 
 const accountTransfer = async (req, res, next) => {
     try {
-        const accountTransfer = await accountService.accountTransfer( req.body );
+        const accountTransfer = await accountService.accountTransfer( req.user, req.body );
         res.json(accountTransfer)
     } catch (error) {
         next(error);
@@ -92,7 +101,7 @@ const getAccountStatement = async (req, res, next) => {
 
 const accountTransferSimulate = async (req, res, next) => {
     try {
-        const accountTransferSimulate = await accountService.accountTransferSimulate( req.body );
+        const accountTransferSimulate = await accountService.accountTransferSimulate( req.user, req.body );
         res.json(accountTransferSimulate)
     } catch (error) {
         next(error);
@@ -102,6 +111,7 @@ const accountTransferSimulate = async (req, res, next) => {
 
 export default {
     createAccount,
+    getMeAccount,
     getAllAccounts,
     getAccountById,
     getAccountByAccountNumber,
