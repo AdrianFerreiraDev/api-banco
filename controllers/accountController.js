@@ -63,6 +63,15 @@ const getAccountBalance = async (req, res, next) => {
     }
 }
 
+const getMeBalance = async (req, res, next) => {
+    try {
+        const meBalance = await accountService.getMeBalance( req.user._id );
+        res.json(meBalance);
+    } catch (error) {
+        next(error);
+    }
+}
+
 const accountDeposit = async (req, res, next) => {
     try {
         const deposit = await accountService.accountDeposit(req.body, req.user._id);
@@ -126,7 +135,7 @@ export default {
     getAccountById,
     getAccountByAccountNumber,
     getAccountBalance,
-    accountDeposit,
+    getMeBalance,
     accountWithdraw,
     accountWithdrawSimulate,
     accountTransfer,

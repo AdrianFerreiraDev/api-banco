@@ -90,6 +90,22 @@ const getAccountBalance = async (id) => {
     return accountBalance;
 }
 
+const getMeBalance = async (id) => {
+    const account = await Account.findById(id);
+
+    if (!account) {
+        const error = new Error("Conta não encontrada/inexistente");
+        error.statusCode = 404;
+        throw error;
+    }
+
+    const { balance, limit } = account
+
+    const accountBalance = { balance, limit, availableBalance: balance + limit }
+
+    return accountBalance;
+}
+
 const accountDeposit = async (data, id) => {
     let account = await Account.findOne({ userId: id });
 
@@ -455,6 +471,7 @@ export default {
     getAccountById,
     getAccountByAccountNumber,
     getAccountBalance,
+    getMeAccount,
     accountDeposit,
     accountWithdraw,
     accountWithdrawSimulate,
