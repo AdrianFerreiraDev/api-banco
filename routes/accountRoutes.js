@@ -12,7 +12,7 @@ router.get("/me/account", authMiddleware, accountController.getMeAccount);
 router.get("/:id", authMiddleware, adminMiddleware, accountController.getAccountById);
 router.get("/number/:accountNumber", authMiddleware, adminMiddleware, accountController.getAccountByAccountNumber);
 router.get("/:id/balance", authMiddleware, adminMiddleware, accountController.getAccountBalance);
-router.get("/balance/me", authMiddleware, accountController.getMeBalance);
+router.get("/me/account/balance", authMiddleware, accountController.getMeBalance);
 router.post("/deposit", authMiddleware, accountController.accountDeposit);
 router.post("/withdraw", authMiddleware, accountController.accountWithdraw);
 router.post("/withdraw/simulate", authMiddleware, accountController.accountWithdrawSimulate);
