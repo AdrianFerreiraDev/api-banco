@@ -16,6 +16,24 @@ const createAccount = async (userData, accountData) => {
     return Account.create({ userId: userData._id, accountNumber, agency, type, balance, limit, active, blocked })
 }
 
+const updateMeAccount = async (id, data) => {
+    const account = await Account.findOneAndUpdate(
+        { userId: id },
+        data
+    );
+
+    if (!account) {
+        const error = new Error("Conta não encontrada/inexistente");
+        error.statusCode = 400;
+        throw error;
+    }
+
+    return {
+        message: "Conta atualizada com sucesso",
+        data: account,
+    }
+}
+
 const getMeAccount = async (id) => {
     const account = await Account.findOne({ userId: id });
 
@@ -431,6 +449,7 @@ const accountTransferSimulate = async (user, data) => {
 
 export default {
     createAccount,
+    updateMeAccount,
     getMeAccount,
     getAllAccounts,
     getAccountById,

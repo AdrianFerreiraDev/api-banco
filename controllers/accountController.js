@@ -9,6 +9,15 @@ const createAccount = async (req, res, next) => {
     }
 }
 
+const updateMeAccount = async (req, res, next) => {
+    try {
+        const updatedAccount = await accountService.updateMeAccount( req.user._id, req.body );
+        res.json(updatedAccount);
+    } catch (error) {
+        next(error);
+    }
+}
+
 const getMeAccount = async (req, res, next) => {
     try {
         const meAccount = await accountService.getMeAccount( req.user._id );
@@ -111,6 +120,7 @@ const accountTransferSimulate = async (req, res, next) => {
 
 export default {
     createAccount,
+    updateMeAccount,
     getMeAccount,
     getAllAccounts,
     getAccountById,
