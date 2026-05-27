@@ -91,7 +91,7 @@ const getAccountBalance = async (id) => {
 }
 
 const getMeBalance = async (id) => {
-    const account = await Account.findByOne({ userId: id });
+    const account = await Account.findOne({ userId: id });
 
     if (!account) {
         const error = new Error("Conta não encontrada/inexistente");
