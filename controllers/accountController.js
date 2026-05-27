@@ -136,6 +136,7 @@ export default {
     getAccountByAccountNumber,
     getAccountBalance,
     getMeBalance,
+    accountDeposit,
     accountWithdraw,
     accountWithdrawSimulate,
     accountTransfer,
