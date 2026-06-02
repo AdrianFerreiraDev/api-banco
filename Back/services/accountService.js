@@ -3,7 +3,18 @@ import Transaction from "../models/Transaction.js";
 import User from "../models/User.js";
 
 const createAccount = async (userData, accountData) => {
-    const { accountNumber, agency, type, balance, limit, active, blocked } = accountData
+    const { agency, type, balance, limit, active, blocked } = accountData;
+    const accountNumber = 0;
+
+    async function makeAccountNumber() {
+        accountNumber = Math.floor(Math.random() * (999999999 - 100000000 + 1)) + 100000000;
+        const accountExist = await Account.findOne({ accountNumber: accountNumber })
+        if (accountExist) {
+            makeAccountNumber();
+        }
+    }
+
+    makeAccountNumber();
 
     const userAccountId = await Account.findOne({ userId: userData._id })
 
@@ -315,7 +326,7 @@ const accountTransfer = async (user, data) => {
             previousBalace: previousBalace,
             currentBalance: currentBalance,
             description: description,
-            status: "completed"       
+            status: "completed"
         })
     }
 
@@ -391,20 +402,20 @@ const accountTransfer = async (user, data) => {
 }
 
 const getAccountStatement = async (id) => {
-    const accountExists = await Account.findById( id );
+    const accountExists = await Account.findById(id);
 
     if (!accountExists) {
         const error = new Error("Conta não encontrada");
         error.statusCode = 400;
         throw error;
     }
-    
+
     const transactions = await Transaction.find({ accountId: id });
 
-    return transactions.filter( transaction =>  transaction.status === "completed" );
+    return transactions.filter(transaction => transaction.status === "completed");
 }
 
-const accountTransferSimulate = async (user, data) => {     
+const accountTransferSimulate = async (user, data) => {
     let fromAccount = await Account.findById(user._id);
     let toAccount = await Account.findById(data.toAccountId);
     const { value, description } = data;
